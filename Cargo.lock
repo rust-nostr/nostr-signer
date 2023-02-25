@@ -509,7 +509,7 @@ dependencies = [
 [[package]]
 name = "nostr-sdk"
 version = "0.18.0"
-source = "git+https://github.com/rust-nostr/nostr?branch=nip46#e1a853d71db43c736bc8de2d7bdf8cb557621133"
+source = "git+https://github.com/rust-nostr/nostr?branch=nip46#89325d175f5b0a6803c9a7ffa234267909cfa388"
 dependencies = [
  "futures-util",
  "log 0.4.17",
