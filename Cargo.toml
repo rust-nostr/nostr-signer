@@ -1,0 +1,17 @@
+[package]
+name = "nostr-signer"
+version = "0.1.0"
+edition = "2021"
+description = "Nostr Connect CLI Signer"
+authors = ["Yuki Kishimoto <yukikishimoto@proton.me>"]
+homepage = "https://github.com/rust-nostr/nostr-signer"
+repository = "https://github.com/rust-nostr/nostr-signer.git"
+license = "MIT"
+readme = "README.md"
+keywords = ["nostr", "sdk", "cli"]
+
+[dependencies]
+dialoguer = "0.10"
+nostr-sdk = { git = "https://github.com/rust-nostr/nostr", branch = "nip46", default-features = false, features = ["nip19", "nip46"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
