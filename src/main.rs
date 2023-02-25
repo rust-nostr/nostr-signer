@@ -65,7 +65,7 @@ async fn main() -> Result<()> {
                                 let nip46_event = EventBuilder::new(
                                     Kind::NostrConnect,
                                     content,
-                                    &[Tag::PubKey(my_keys.public_key(), None)],
+                                    &[Tag::PubKey(uri.public_key, None)],
                                 )
                                 .to_event(&my_keys)?;
                                 let id = client.send_event(nip46_event).await?;
