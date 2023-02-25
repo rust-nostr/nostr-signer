@@ -48,7 +48,10 @@ async fn main() -> Result<()> {
             if event.kind == Kind::NostrConnect {
                 if let Ok(msg) = decrypt(&my_keys.secret_key()?, &event.pubkey, &event.content) {
                     let msg = Message::from_json(msg)?;
-                    println!("Message: {msg:?}");
+
+                    println!("\n###############################################\n");
+                    println!("New message received: {msg:#?}");
+                    println!("\n###############################################\n");
                     if let Ok(req) = msg.to_request() {
                         if cli::io::ask("Approve?")? {
                             if let Request::SignEvent(unsigned_event) = req {
@@ -69,7 +72,7 @@ async fn main() -> Result<()> {
                                 )
                                 .to_event(&my_keys)?;
                                 let id = client.send_event(nip46_event).await?;
-                                println!("Event sent: {id}")
+                                println!("\nEvent sent: {id}")
                             }
                         }
                     }
