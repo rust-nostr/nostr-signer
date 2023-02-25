@@ -5,6 +5,7 @@ use std::str::FromStr;
 
 use nostr_sdk::nostr::nips::nip46::{Message, Request};
 use nostr_sdk::prelude::*;
+use serde_json::json;
 
 mod cli;
 
@@ -42,6 +43,10 @@ async fn main() -> Result<()> {
             .since(Timestamp::now())])
         .await;
 
+    println!("\n###############################################\n");
+    println!("Listening...");
+    println!("\n###############################################\n");
+
     let mut notifications = client.notifications();
     while let Ok(notification) = notifications.recv().await {
         if let RelayPoolNotification::Event(_url, event) = notification {
@@ -49,29 +54,45 @@ async fn main() -> Result<()> {
                 if let Ok(msg) = decrypt(&my_keys.secret_key()?, &event.pubkey, &event.content) {
                     let msg = Message::from_json(msg)?;
 
-                    println!("\n###############################################\n");
                     println!("New message received: {msg:#?}");
                     println!("\n###############################################\n");
                     if let Ok(req) = msg.to_request() {
                         if cli::io::ask("Approve?")? {
-                            if let Request::SignEvent(unsigned_event) = req {
-                                let signed_event = unsigned_event.sign(&my_keys)?;
-                                // Send response
-                                let sig = serde_json::json!(signed_event.sig);
-                                let res = Message::Response {
+                            let res: Option<Message> = match req {
+                                Request::Describe => Some(Message::Response {
                                     id: msg.id(),
-                                    result: Some(sig),
+                                    result: Some(json!({
+                                        "get_public_key": {
+                                            "params": [],
+                                            "result": "something",
+                                        }
+                                    })),
                                     error: None,
-                                };
-                                let content =
-                                    encrypt(&my_keys.secret_key()?, &event.pubkey, res.as_json())?;
-                                let nip46_event = EventBuilder::new(
+                                }),
+                                Request::GetPublicKey => Some(Message::Response {
+                                    id: msg.id(),
+                                    result: Some(json!(my_keys.public_key())),
+                                    error: None,
+                                }),
+                                Request::SignEvent(unsigned_event) => {
+                                    let signed_event = unsigned_event.sign(&my_keys)?;
+                                    Some(Message::Response {
+                                        id: msg.id(),
+                                        result: Some(json!(signed_event.sig)),
+                                        error: None,
+                                    })
+                                }
+                                _ => None,
+                            };
+
+                            if let Some(res) = res {
+                                let event = EventBuilder::new(
                                     Kind::NostrConnect,
-                                    content,
+                                    encrypt(&my_keys.secret_key()?, &event.pubkey, res.as_json())?,
                                     &[Tag::PubKey(uri.public_key, None)],
                                 )
                                 .to_event(&my_keys)?;
-                                let id = client.send_event(nip46_event).await?;
+                                let id = client.send_event(event).await?;
                                 println!("\nEvent sent: {id}")
                             }
                         }
