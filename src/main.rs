@@ -5,7 +5,6 @@ use std::str::FromStr;
 
 use nostr_sdk::nostr::nips::nip46::{Message, Request};
 use nostr_sdk::prelude::*;
-use serde_json::json;
 
 mod cli;
 
@@ -51,43 +50,13 @@ async fn main() -> Result<()> {
 
                     println!("New message received: {msg:#?}");
                     println!("\n###############################################\n");
-                    if let Ok(req) = msg.to_request() {
-                        if cli::io::ask("Approve?")? {
-                            let res: Option<Message> = match req {
-                                Request::Describe => Some(Message::Response {
-                                    id: msg.id(),
-                                    result: Some(json!({
-                                        "get_public_key": {
-                                            "params": [],
-                                            "result": "something",
-                                        }
-                                    })),
-                                    error: None,
-                                }),
-                                Request::GetPublicKey => Some(Message::Response {
-                                    id: msg.id(),
-                                    result: Some(json!(my_keys.public_key())),
-                                    error: None,
-                                }),
-                                Request::SignEvent(unsigned_event) => {
-                                    let signed_event = unsigned_event.sign(&my_keys)?;
-                                    Some(Message::Response {
-                                        id: msg.id(),
-                                        result: Some(json!(signed_event.sig)),
-                                        error: None,
-                                    })
-                                }
-                                _ => None,
-                            };
-
-                            if let Some(res) = res {
-                                let event =
-                                    EventBuilder::nostr_connect(&my_keys, event.pubkey, res)?
-                                        .to_event(&my_keys)?;
-                                let id = client.send_event(event).await?;
-                                println!("\nEvent sent: {id}");
-                                println!("\n###############################################\n");
-                            }
+                    if msg.is_request() && cli::io::ask("Approve?")? {
+                        if let Some(msg) = msg.generate_response(&my_keys)? {
+                            let event = EventBuilder::nostr_connect(&my_keys, event.pubkey, msg)?
+                                .to_event(&my_keys)?;
+                            let id = client.send_event(event).await?;
+                            println!("\nEvent sent: {id}");
+                            println!("\n###############################################\n");
                         }
                     }
                 } else {

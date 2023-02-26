@@ -401,7 +401,7 @@ dependencies = [
 [[package]]
 name = "nostr"
 version = "0.18.0"
-source = "git+https://github.com/rust-nostr/nostr?branch=nip46#d32c97bcb760210734e639946c7e44c788f1a892"
+source = "git+https://github.com/rust-nostr/nostr?rev=42b1359ff69d0b8ab76261e83237d7eec802faf4#42b1359ff69d0b8ab76261e83237d7eec802faf4"
 dependencies = [
  "aes",
  "base64 0.21.0",
@@ -421,7 +421,7 @@ dependencies = [
 [[package]]
 name = "nostr-sdk"
 version = "0.18.0"
-source = "git+https://github.com/rust-nostr/nostr?branch=nip46#d32c97bcb760210734e639946c7e44c788f1a892"
+source = "git+https://github.com/rust-nostr/nostr?rev=42b1359ff69d0b8ab76261e83237d7eec802faf4#42b1359ff69d0b8ab76261e83237d7eec802faf4"
 dependencies = [
  "futures-util",
  "log",
@@ -441,7 +441,6 @@ version = "0.1.0"
 dependencies = [
  "dialoguer",
  "nostr-sdk",
- "serde_json",
  "tokio",
 ]
 
