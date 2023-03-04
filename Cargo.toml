@@ -13,4 +13,4 @@ keywords = ["nostr", "sdk", "cli"]
 [dependencies]
 dialoguer = "0.10"
 nostr-sdk = { version = "0.19", default-features = false, features = ["nip19", "nip46"] }
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1.26", features = ["rt"] }
