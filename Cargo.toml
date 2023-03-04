@@ -12,5 +12,5 @@ keywords = ["nostr", "sdk", "cli"]
 
 [dependencies]
 dialoguer = "0.10"
-nostr-sdk = { git = "https://github.com/rust-nostr/nostr", rev = "42b1359ff69d0b8ab76261e83237d7eec802faf4", default-features = false, features = ["nip19", "nip26", "nip46"] }
+nostr-sdk = { version = "0.19", default-features = false, features = ["nip19", "nip46"] }
 tokio = { version = "1", features = ["full"] }
