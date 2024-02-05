@@ -1,4 +1,4 @@
-// Copyright (c) 2023 Yuki Kishimoto
+// Copyright (c) 2023-2024 Yuki Kishimoto
 // Distributed under the MIT software license
 
 use std::str::FromStr;
@@ -19,7 +19,7 @@ async fn main() -> Result<()> {
     let uri: NostrConnectURI = NostrConnectURI::from_str(&uri)?;
 
     let client = Client::new(&my_keys);
-    client.add_relay(uri.relay_url, None).await?;
+    client.add_relay(uri.relay_url).await?;
 
     client.connect().await;
 
@@ -43,7 +43,7 @@ async fn main() -> Result<()> {
 
     let mut notifications = client.notifications();
     while let Ok(notification) = notifications.recv().await {
-        if let RelayPoolNotification::Event(_url, event) = notification {
+        if let RelayPoolNotification::Event { event, .. } = notification {
             if event.kind == Kind::NostrConnect {
                 if let Ok(msg) = decrypt(&my_keys.secret_key()?, &event.pubkey, &event.content) {
                     let msg = Message::from_json(msg)?;
@@ -52,7 +52,7 @@ async fn main() -> Result<()> {
                     println!("\n###############################################\n");
                     if msg.is_request() && cli::io::ask("Approve?")? {
                         if let Some(msg) = msg.generate_response(&my_keys)? {
-                            let event = EventBuilder::nostr_connect(&my_keys, event.pubkey, msg)?
+                            let event = EventBuilder::nostr_connect(&my_keys, event.author(), msg)?
                                 .to_event(&my_keys)?;
                             let id = client.send_event(event).await?;
                             println!("\nEvent sent: {id}");
