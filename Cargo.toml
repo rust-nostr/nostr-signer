@@ -1,6 +1,6 @@
 [package]
 name = "nostr-signer"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "Nostr Connect CLI Signer"
 authors = ["Yuki Kishimoto <yukikishimoto@proton.me>"]
